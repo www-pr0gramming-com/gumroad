@@ -7,6 +7,10 @@ from main.users.forms import UserAdminChangeForm, UserAdminCreationForm
 
 User = get_user_model()
 
+from .models import UserLibrary
+
+admin.site.register(UserLibrary)
+
 
 @admin.register(User)
 class UserAdmin(auth_admin.UserAdmin):

@@ -3,6 +3,9 @@ from django.db.models import CharField
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from django.db import models
+from app1.models import Product
+
 
 class User(AbstractUser):
     """
@@ -24,3 +27,15 @@ class User(AbstractUser):
 
         """
         return reverse("users:detail", kwargs={"username": self.username})
+
+
+class UserLibrary(models.Model):
+    # class Meta:
+    #     verbose_name_plural = ""
+    #     verbose_name = ""
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="library")
+    products = models.ManyToManyField(Product, blank=True)
+
+    def __str__(self):
+        return self.user.email
