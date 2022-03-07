@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from django.db import models
-from app1.models import Product
+from main.app1.models import Product
 
 
 class User(AbstractUser):
