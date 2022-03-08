@@ -7,13 +7,14 @@ from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.authtoken.views import obtain_auth_token
 
-from main.app1.views import ProductListView
+from main.app1.views import ProductListView, UserProductListView
 
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path("discover/", ProductListView.as_view(), name="discover"),
     path("p/", include("main.app1.urls", namespace="products")),
+    path("products/", UserProductListView.as_view(), name="user-products"),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
