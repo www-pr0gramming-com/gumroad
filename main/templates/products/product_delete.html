@@ -6,17 +6,16 @@
 
 <div class="container my-5 py-5">
 
-  <h1>Create product</h1>
+  <h1>Delete product : {{ object.name }}</h1>
 
   <hr>
 
-  <form method="POST" action="." enctype="multipart/form-data">
+  <form method="POST" action=".">
     {% csrf_token %}
     {{ form|crispy }}
 
-
     <div class="d-grid gap-2">
-      <button class="primaryAction btn btn-primary" type="submit">Create Product</button>
+      <button class="primaryAction btn btn-danger" type="submit">Delete Product</button>
     </div>
   </form>
 

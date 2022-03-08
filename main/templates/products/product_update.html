@@ -6,7 +6,7 @@
 
 <div class="container my-5 py-5">
 
-  <h1>Create product</h1>
+  <h1>Update product : {{ object.name }}</h1>
 
   <hr>
 
@@ -14,9 +14,10 @@
     {% csrf_token %}
     {{ form|crispy }}
 
-
     <div class="d-grid gap-2">
-      <button class="primaryAction btn btn-primary" type="submit">Create Product</button>
+      <button class="primaryAction btn btn-primary mb-3" type="submit">Update Product</button>
+      <a href="{{ object.get_delete_url }}" class="primaryAction btn btn-danger" type="submit">Delete Product</a>
+
     </div>
   </form>
 
