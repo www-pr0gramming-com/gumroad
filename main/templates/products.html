@@ -43,6 +43,14 @@
 
             <hr>
 
+            {% if product.active %}
+            <p class="card-text">active</p>
+            {% else %}
+            <p class="card-text">not active</p>
+            {% endif %}
+
+            <hr>
+
             <a href="{{ product.get_update_url }}">
               <p class="card-text">update</p>
             </a>

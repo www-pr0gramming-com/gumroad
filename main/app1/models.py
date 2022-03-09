@@ -21,6 +21,7 @@ class Product(models.Model):
     )
     content_file = models.FileField(blank=True, null=True)
 
+    active = models.BooleanField(default=False)
     price = models.IntegerField(default=1)
 
     def __str__(self):
