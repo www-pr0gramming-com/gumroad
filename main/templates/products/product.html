@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 
+{% block javascript %}
+{{ block.super }}
+
+<script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
+<script src="https://js.stripe.com/v3/"></script>
+{% endblock javascript %}
+
 
 {% block content %}
 
@@ -37,10 +44,31 @@
           </div>
         </div>
       </div>
-
-
-
     </div>
+
+
+
+    <div class="product my-5">
+      {% if product.cover %}
+      <img src="{{ product.cover.url }}" alt="{{product.name}}" />
+      {% else %}
+      <img src="https://i.imgur.com/EHyR2nP.png" alt="The cover of Stubborn Attachments" />
+
+      {% endif %}
+      <div class="description">
+        <h3>{{ product.name }}</h3>
+        <h5>&yen; {{ product.price }}</h5>
+      </div>
+    </div>
+
+    <form action="/create-checkout-session/{{product.slug}}/" method="POST">
+      {% csrf_token %}
+      <button type="submit" id="checkout-button">Checkout</button>
+    </form>
+
+
   </div>
 </div>
+
+
 {% endblock content %}

@@ -7,7 +7,12 @@ from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.authtoken.views import obtain_auth_token
 
-from main.app1.views import ProductListView, UserProductListView, ProductCreateView
+from main.app1.views import (
+    ProductListView,
+    UserProductListView,
+    ProductCreateView,
+    CreateCheckoutSessionView,
+)
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
@@ -15,6 +20,14 @@ urlpatterns = [
     path("p/", include("main.app1.urls", namespace="products")),
     path("products/", UserProductListView.as_view(), name="user-products"),
     path("products/create/", ProductCreateView.as_view(), name="product-create"),
+    path(
+        "create-checkout-session/<slug>/",
+        CreateCheckoutSessionView.as_view(),
+        name="create-checkout-session",
+    ),
+    path(
+        "success/", TemplateView.as_view(template_name="success.html"), name="success"
+    ),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
