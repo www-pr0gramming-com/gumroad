@@ -61,11 +61,29 @@
       </div>
     </div>
 
+    {% if has_access %}
+
+    <h2>!! you can access</h2><br>
+    <hr>
+
+    {% if product.content_url %}
+    <a href="{{product.content_url}}" target="_blank" rel="nofollow noreferrer" class="btn btn-primary">
+      View content
+    </a>
+    {% endif %}
+
+    {% if product.content_file %}
+    <a href="{{product.content_file.url}}" download class="btn btn-success">
+      Download content
+    </a>
+    {% endif %}
+
+    {% else %}
     <form action="/create-checkout-session/{{product.slug}}/" method="POST">
       {% csrf_token %}
       <button type="submit" id="checkout-button">Checkout</button>
     </form>
-
+    {% endif %}
 
   </div>
 </div>

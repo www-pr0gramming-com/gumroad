@@ -33,6 +33,20 @@ class ProductDetailView(generic.DetailView):
     queryset = Product.objects.all()
     queryset_object_name = "product"
 
+    def get_context_data(self, **kwargs):
+        context = super(ProductDetailView, self).get_context_data(**kwargs)
+        product = self.get_object()
+        has_access = False
+        if self.request.user.is_authenticated:
+            if product in self.request.user.userlibrary.products.all():
+                has_access = True
+        context.update(
+            {
+                "has_access": has_access,
+            }
+        )
+        return context
+
 
 class UserProductListView(LoginRequiredMixin, generic.ListView):
     template_name = "products.html"
@@ -174,7 +188,6 @@ def stripe_webhook(request, *args, **kwargs):
             except User.DoesNotExist:
                 pass
 
-    # ... handle other event types
     else:
         print("Unhandled event type {}".format(event["type"]))
 
