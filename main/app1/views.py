@@ -18,6 +18,10 @@ from django.http import HttpResponse
 
 from django.views.decorators.csrf import csrf_exempt
 
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 
 class ProductListView(generic.ListView):
     template_name = "discover.html"
@@ -83,12 +87,22 @@ class CreateCheckoutSessionView(generic.View):
         product = get_object_or_404(Product, slug=self.kwargs["slug"])
 
         domain = "https://domain.com"
-
         if settings.DEBUG:
             domain = "http://127.0.0.1:8000"
 
+        customer = None
+        customer_email = None
+
+        if request.user.is_authenticated:
+            if request.user.stripe_customer_id:
+                customer = request.user.stripe_customer_id
+            else:
+                customer_email = request.user.email
+
         try:
             checkout_session = stripe.checkout.Session.create(
+                customer=customer,
+                customer_email=customer_email,
                 line_items=[
                     {
                         "price_data": {
@@ -105,6 +119,9 @@ class CreateCheckoutSessionView(generic.View):
                 mode="payment",
                 success_url=domain + reverse("success"),
                 cancel_url=domain + reverse("discover"),
+                metadata={
+                    "product_id": product.pk,
+                },
             )
         except Exception as e:
             return str(e)
@@ -132,14 +149,33 @@ def stripe_webhook(request, *args, **kwargs):
         print(e)
         return HttpResponse(status=400)
 
-    print(event)
+    # Handle the event
+    if event["type"] == "checkout.session.completed":
+        product_id = event["data"]["object"]["metadata"]["product_id"]
+        product = Product.objects.get(id=product_id)
 
-    # # Handle the event
-    # if event["type"] == "checkout.session.completed":
-    #     session = event["data"]["object"]
+        stripe_customer_id = event["data"]["object"]["customer"]
 
-    # # ... handle other event types
-    # else:
-    #     print("Unhandled event type {}".format(event["type"]))
+        try:
+            user = User.objects.get(stripe_customer_id=stripe_customer_id)
+            user.userlibrary.products.add(product)
+            print("stripe_customer_id ok")
+
+        except User.DoesNotExist:
+            stripe_customer_email = event["data"]["object"]["customer_details"]["email"]
+            print("stripe_customer_id not ok")
+
+            try:
+                user = User.objects.get(email=stripe_customer_email)
+                user.stripe_customer_id = stripe_customer_id
+                user.save()
+                user.userlibrary.products.add(product)
+
+            except User.DoesNotExist:
+                pass
+
+    # ... handle other event types
+    else:
+        print("Unhandled event type {}".format(event["type"]))
 
     return HttpResponse()

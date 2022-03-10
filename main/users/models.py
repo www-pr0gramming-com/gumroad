@@ -6,6 +6,8 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 from main.app1.models import Product
 
+from django.db.models.signals import post_save
+
 
 class User(AbstractUser):
     """
@@ -18,6 +20,7 @@ class User(AbstractUser):
     name = CharField(_("Name of User"), blank=True, max_length=255)
     first_name = None  # type: ignore
     last_name = None  # type: ignore
+    stripe_customer_id = models.CharField(max_length=100, blank=True, null=True)
 
     def get_absolute_url(self):
         """Get url for user's detail view.
@@ -34,8 +37,16 @@ class UserLibrary(models.Model):
     #     verbose_name_plural = ""
     #     verbose_name = ""
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="library")
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     products = models.ManyToManyField(Product, blank=True)
 
     def __str__(self):
         return self.user.email
+
+
+def post_save_user_receiver(sender, instance, created, **kwargs):
+    if created:
+        UserLibrary.objects.create(user=instance)
+
+
+post_save.connect(post_save_user_receiver, sender=User)
