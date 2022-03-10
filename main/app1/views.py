@@ -14,6 +14,10 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 from django.shortcuts import get_object_or_404
 
+from django.http import HttpResponse
+
+from django.views.decorators.csrf import csrf_exempt
+
 
 class ProductListView(generic.ListView):
     template_name = "discover.html"
@@ -106,3 +110,36 @@ class CreateCheckoutSessionView(generic.View):
             return str(e)
 
         return redirect(checkout_session.url, code=303)
+
+
+@csrf_exempt
+def stripe_webhook(request, *args, **kwargs):
+    event = None
+    payload = request.body
+    sig_header = request.headers["STRIPE_SIGNATURE"]
+    endpoint_secret = "whsec_aRnn8IM5KB0rWjvosjEEJsk1cqXfdiE7"
+
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
+
+    except ValueError as e:
+        # Invalid payload
+        print(e)
+        return HttpResponse(status=400)
+
+    except stripe.error.SignatureVerificationError as e:
+        # Invalid signature
+        print(e)
+        return HttpResponse(status=400)
+
+    print(event)
+
+    # # Handle the event
+    # if event["type"] == "checkout.session.completed":
+    #     session = event["data"]["object"]
+
+    # # ... handle other event types
+    # else:
+    #     print("Unhandled event type {}".format(event["type"]))
+
+    return HttpResponse()

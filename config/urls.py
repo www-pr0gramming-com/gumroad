@@ -1,3 +1,4 @@
+from this import s
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -12,6 +13,7 @@ from main.app1.views import (
     UserProductListView,
     ProductCreateView,
     CreateCheckoutSessionView,
+    stripe_webhook,
 )
 
 urlpatterns = [
@@ -28,6 +30,7 @@ urlpatterns = [
     path(
         "success/", TemplateView.as_view(template_name="success.html"), name="success"
     ),
+    path("webhook/stripe/", stripe_webhook, name="webhook"),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
