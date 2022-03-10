@@ -8,6 +8,8 @@ from main.app1.models import Product
 
 from django.db.models.signals import post_save
 
+from main.app1.models import Product, PurchasedProduct
+
 
 class User(AbstractUser):
     """
@@ -46,7 +48,11 @@ class UserLibrary(models.Model):
 
 def post_save_user_receiver(sender, instance, created, **kwargs):
     if created:
-        UserLibrary.objects.create(user=instance)
+        library = UserLibrary.objects.create(user=instance)
+
+        purchased_products = PurchasedProduct.objects.filter(email=instance.email)
+        for purchased_product in purchased_products:
+            library.products.add(purchased_product.product)
 
 
 post_save.connect(post_save_user_receiver, sender=User)

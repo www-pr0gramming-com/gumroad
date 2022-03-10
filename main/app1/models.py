@@ -35,3 +35,12 @@ class Product(models.Model):
 
     def get_delete_url(self):
         return reverse("products:product-delete", kwargs={"slug": self.slug})
+
+
+class PurchasedProduct(models.Model):
+    email = models.EmailField()
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    date_purchased = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email

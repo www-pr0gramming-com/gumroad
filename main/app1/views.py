@@ -1,7 +1,7 @@
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views import generic
-from .models import Product
+from .models import Product, PurchasedProduct
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import ProductModelForm
 
@@ -21,6 +21,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
+
+from django.core.mail import send_mail
 
 
 class ProductListView(generic.ListView):
@@ -186,7 +188,18 @@ def stripe_webhook(request, *args, **kwargs):
                 user.userlibrary.products.add(product)
 
             except User.DoesNotExist:
-                pass
+                print("no account")
+
+                PurchasedProduct.objects.create(
+                    email=stripe_customer_email, product=product
+                )
+
+                send_mail(
+                    subject="You can access your content",
+                    message="Please signup",
+                    recipient_list=[stripe_customer_email],
+                    from_email="test@test.com",
+                )
 
     else:
         print("Unhandled event type {}".format(event["type"]))
