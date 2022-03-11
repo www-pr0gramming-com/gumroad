@@ -115,6 +115,11 @@ class CreateCheckoutSessionView(generic.View):
             else:
                 customer_email = request.user.email
 
+        product_image_urls = []
+        if product.cover:
+            if not settings.DEBUG:
+                product_image_urls.append(domain + product.cover.url)
+
         try:
             checkout_session = stripe.checkout.Session.create(
                 customer=customer,
@@ -125,7 +130,10 @@ class CreateCheckoutSessionView(generic.View):
                             "currency": "jpy",
                             "product_data": {
                                 "name": product.name,
-                                # "images": product.cover.url,
+                                # "images": [
+                                #     "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
+                                # ],
+                                "images": product_image_urls,
                             },
                             "unit_amount": product.price,
                         },
