@@ -3,9 +3,27 @@
 
 {% block content %}
 
-<h1>
+<h1 class="my-3">
   My Profile
 </h1>
+
+<hr>
+
+<div class="container m-5">
+
+  {% if details_submitted_message or external_account_message or individual_message %}
+  <h2>Connect stripe account</h2>
+  <h4 class="text-danger"> {{details_submitted_message}} </h4>
+  <h4 class="text-danger"> {{external_account_message}} </h4>
+  <h4 class="text-danger"> {{individual_message}} </h4>
+
+  <a href="{% url 'stripe-account-link' %}" class="btn btn-primary btn-lg m-3 text-uppercase">connect stripe</a>
+
+  {% else %}
+
+  <h2>complete</h2>
+  {% endif %}
+</div>
 
 
 <div class="album py-5 bg-light">

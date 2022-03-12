@@ -15,15 +15,17 @@ from main.app1.views import (
     stripe_webhook,
 )
 
+from main.users.views import StripeAccountLinkView, UserProfileView
+
+
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path("discover/", ProductListView.as_view(), name="discover"),
-    path(
-        "profile/", TemplateView.as_view(template_name="profile.html"), name="profile"
-    ),
+    path("profile/", UserProfileView.as_view(), name="profile"),
     path("p/", include("main.app1.urls", namespace="products")),
     path("products/", UserProductListView.as_view(), name="user-products"),
     path("products/create/", ProductCreateView.as_view(), name="product-create"),
+    path("stripe/auth/", StripeAccountLinkView.as_view(), name="stripe-account-link"),
     path(
         "create-checkout-session/<slug>/",
         CreateCheckoutSessionView.as_view(),

@@ -3,9 +3,49 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, RedirectView, UpdateView
+from django.views.generic import DetailView, RedirectView, UpdateView, TemplateView
 
 User = get_user_model()
+
+import stripe
+from django.conf import settings
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+class UserProfileView(LoginRequiredMixin, TemplateView):
+    template_name = "profile.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(UserProfileView, self).get_context_data(**kwargs)
+
+        account = stripe.Account.retrieve(self.request.user.stripe_account_id)
+        # print(account)
+
+        details_submitted_message = ""
+        external_account_message = ""
+        individual_message = ""
+
+        if not account["details_submitted"]:
+            details_submitted_message = "details_submitted need"
+
+        if "external_account" in account["requirements"]["currently_due"]:
+            external_account_message = "external_account need"
+
+        if (
+            "individual.verification.document"
+            in account["requirements"]["currently_due"]
+        ):
+            individual_message = "individual.verification.document need"
+
+        context.update(
+            {
+                "details_submitted_message": details_submitted_message,
+                "external_account_message": external_account_message,
+                "individual_message": individual_message,
+            }
+        )
+        return context
 
 
 class UserDetailView(LoginRequiredMixin, DetailView):
@@ -46,3 +86,25 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
 
 
 user_redirect_view = UserRedirectView.as_view()
+
+
+class StripeAccountLinkView(LoginRequiredMixin, RedirectView):
+
+    permanent = False
+
+    def get_redirect_url(self):
+
+        domain = "https://domain.com"
+        if settings.DEBUG:
+            domain = "http://127.0.0.1:8000"
+
+        account_links = stripe.AccountLink.create(
+            account=self.request.user.stripe_account_id,
+            refresh_url=domain + reverse("stripe-account-link"),
+            return_url=domain + reverse("profile"),
+            type="account_onboarding",
+        )
+
+        # print(account_links)
+
+        return account_links["url"]

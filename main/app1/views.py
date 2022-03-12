@@ -140,6 +140,12 @@ class CreateCheckoutSessionView(generic.View):
                         "quantity": 1,
                     }
                 ],
+                payment_intent_data={
+                    "application_fee_amount": 100,
+                    "transfer_data": {
+                        "destination": product.user.stripe_account_id,
+                    },
+                },
                 mode="payment",
                 success_url=domain + reverse("success"),
                 cancel_url=domain + reverse("discover"),
@@ -208,6 +214,9 @@ def stripe_webhook(request, *args, **kwargs):
                     recipient_list=[stripe_customer_email],
                     from_email="test@test.com",
                 )
+
+    elif event["type"] == "account.updated":
+        print(event)
 
     else:
         print("Unhandled event type {}".format(event["type"]))
