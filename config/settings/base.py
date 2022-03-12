@@ -312,5 +312,5 @@ SPECTACULAR_SETTINGS = {
 # ------------------------------------------------------------------------------
 
 # stripe
-STRIPE_PUBLIC_KEY = "pk_test_51JuBBUBQiGyA5MbMZFfePRdzUcL80A0lWbSnzPP8lSmuEp6Z0naZSqfISvBJ6d3oAdtSjxtAG4gRO5grGRKEC42300uwL5ASwt"
-STRIPE_SECRET_KEY = "sk_test_51JuBBUBQiGyA5MbMg18MgW2S3r5Cmnie1B8gPp5sMBcPySHEIVTwx4LeTeKHEz9FHAKrT7wLWaU6zWeZQJq1dAy200d52eeXkb"
+STRIPE_PUBLIC_KEY = ""
+STRIPE_SECRET_KEY = ""
